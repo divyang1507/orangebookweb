@@ -5,13 +5,11 @@ import { useProduct } from "./context/ProductContext";
 import { useEffect } from "react";
 
 export default function Home() {
-  const {book, getbook, error} = useProduct();
-  useEffect(() => {
-    getbook();
-  }, [])
+  const {book} = useProduct();
+
   
   console.log(book);
-  console.log(error);
+  // console.log(error);
   return (
     <>
     <HeroSlider/>
