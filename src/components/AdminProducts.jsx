@@ -9,11 +9,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import EditProductDialog from "./EditProductDialog";
 import { useProduct } from "@/app/context/ProductContext";
+import Link from "next/link";
 
 const AdminProducts = () => {
-  const { book } = useProduct();
+  const { books } = useProduct();
+  
   return (
     <Table>
       <TableCaption>A list of Products.</TableCaption>
@@ -29,17 +30,18 @@ const AdminProducts = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {book?.map((item, id) => {
+        {books?.map((item, id) => { 
+          console.log(item.id)
           return (
             <TableRow key={id}>
               <TableCell className="font-medium">{item.name}</TableCell>
+              <TableCell>{}</TableCell>
               <TableCell>{item.price}</TableCell>
+              <TableCell className="" ><p className="w-[150px] truncate">{item.details}</p></TableCell>
               <TableCell>{item.inventory}</TableCell>
-              <TableCell>Credit Card</TableCell>
-              <TableCell>Credit Card</TableCell>
-              <TableCell>Credit Card</TableCell>
+              <TableCell>{item.instock ? "in Stock" : "Stopped"}</TableCell>
               <TableCell className="text-right">
-                <EditProductDialog />
+                <Link href={`admindashboard/editpage/${item.id}`}>Edit</Link>
               </TableCell>
             </TableRow>
           );

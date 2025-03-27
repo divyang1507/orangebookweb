@@ -1,183 +1,120 @@
-// import React, { createContext, useContext, useState } from 'react';
-// import { db } from '@/firebase';
-// import { collection, getDocs, doc, setDoc, addDoc  } from 'firebase/firestore';
-// import { getDownloadURL, uploadBytes } from 'firebase/storage';
-// import { supabase } from '@/lib/superbaseclient';
-// const ProductContext = createContext();
-// const ProductProvider = ({ children }) => {
-//   const [book, setBook] = useState();
-//   const [uploadProgress, setUploadProgress] = useState(0); // Optional: track upload progress
-//   // const [error, setError] = useState(null);
-//   const [loading, setLoading] = useState(false);
+"use client";
 
-  
-
-// const  getBook = async ()=> {
-//   const { data, error } = await supabase
-//     .from('books')  // Replace 'books' with your table name
-//     .select('*');
-
-//   if (error) console.error(error);
-//   return data;
-// }
-//   // const getbook = async () => {
-//   //   try {
-//   //     const querySnapshot = await getDocs(collection(db, "books")); // Ensure "books" is your Firestore collection
-//   //     const booksList = querySnapshot.docs.map(doc => ({
-//   //       id: doc.id,
-//   //       ...doc.data()
-//   //     }));
-      
-//   //     console.log(booksList);
-//   //     setBook(booksList); // Set the fetched books in state
-//   //   } catch (error) {
-//   //     console.error("Error fetching data:", error);
-//   //     setError(error.message);
-//   //   }
-//   // };
-  
-
-//   // const uploadImage = async (imageFile) => {
-//   //   const imageRef = ref(storage, `books/${imageFile.name}-${Date.now()}`);
-//   //   await uploadBytes(imageRef, imageFile);
-//   //   return await getDownloadURL(imageRef);
-//   // };
-
-//   // const addBook = async (bookData) => {
-//   //   try {
-//   //     setLoading(true);
-//   //     // Upload images and get their URLs
-//   //     const imageUrls = await Promise.all(bookData.images.map(uploadImage));
-
-//   //     const bookRef = await addDoc(collection(db, "books"), {
-//   //       name: bookData.name,
-//   //       details: bookData.details,
-//   //       images: imageUrls, // Uploaded image URLs
-//   //       price: bookData.price,
-//   //       inventory: bookData.inventory,
-//   //       stock: bookData.stock,
-//   //       createdAt: serverTimestamp(),
-//   //     });
-
-//   //     setLoading(false);
-//   //     return { success: true, id: bookRef.id };
-//   //   } catch (error) {
-//   //     console.error("Error adding book: ", error);
-//   //     setLoading(false);
-//   //     return { success: false, error: error.message };
-//   //   }
-//   // };
-
-
-
-
-
-  
-
-//   return (
-//     <ProductContext.Provider value={{ getBook, book, error, loading }}>
-//       {children}
-//     </ProductContext.Provider>
-//   );
-// };
-
-// // Custom Hook
-// export const useProduct = () => useContext(ProductContext);
-
-// export default ProductProvider;
-"use client";  // 👈 Required for React Context in Next.js
-
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '@/lib/superbaseclient';
-import { boolean } from 'zod';
+import { supabase } from "@/lib/superbaseclient";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 
 const ProductContext = createContext();
 
 const ProductProvider = ({ children }) => {
-  const [book, setBook] = useState([]);
-  const [error, setError] = useState(null);  // ✅ Ensure `error` is declared
+  const [books, setBooks] = useState([]);
+  const [book, setBook] = useState(null); // ✅ Changed from array to null
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const getBook = async () => {
+  // ✅ Optimized getBook using useCallback
+  const getBook = useCallback(async () => {
     setLoading(true);
     setError(null); // Reset error before fetching
 
-    const { data, error } = await supabase.from('books').select('*');
+    const { data, error } = await supabase.from("books").select("*");
 
     if (error) {
       console.error("Supabase Error:", error);
-      setError(error.message);  // ✅ Store error in state
+      setError(error.message);
     } else {
-      console.log("Fetched Data:", data);
-      setBook(data);
+      setBooks(data);
     }
 
     setLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     getBook();
-  }, [])
+  }, [getBook]);
 
+  // ✅ Enhanced addBook function with better image handling
+  const addBook = async ({ name, details, price, inventory, instock, images }) => {
+    try {
+      let imageUrls = [];
 
-  const addBook = async ({name, details, price, inventory, instock, images}) => {
-    const supabaseUrl = "https://zvovqfrbiuoqnnvoznah.supabase.co";
-    if (images.length !== 5) {
-      console.error("You must upload exactly 5 images.");
-      return;
-    }
-  
-    const uploadedImageUrls = [];
-  
-    // Loop through each image and upload to Supabase Storage
-    for (const image of images) {
-      const fileExt = image.name.split('.').pop();
-      const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 5)}.${fileExt}`;
-      const filePath = `books/${fileName}`; // Folder structure in Supabase Storage
-  
-      // Upload image
-      const { data, error } = await supabase.storage.from("book-images").upload(filePath, image);
-  
-      if (error) {
-        console.error("Error uploading image:", error);
-        return;
-      }
-  
-      // Get the public URL of the uploaded image
-      const { data: urlData } = supabase.storage.from("book-images").getPublicUrl(filePath);
-      uploadedImageUrls.push(urlData.publicUrl);
-    }
+      if (images && images.length > 0) {
+        for (const imageFile of images) {
+          const fileExt = imageFile.name.split(".").pop();
+          const fileBaseName = imageFile.name.replace(`.${fileExt}`, "").replace(/\s+/g, "-");
+          const fileName = `${fileBaseName}-${Date.now()}.${fileExt}`;
 
+          const { data, error } = await supabase.storage
+            .from("cover-image") // Bucket name
+            .upload(fileName, imageFile);
 
-    const { data, error } = await supabase
-      .from('books')  // Ensure the table name matches exactly
-      .insert([
-        {
+          if (error) throw error;
 
-          name : name, // Replace with your book properties e.g. name
-          details : details,
-          price : price,
-          inventory : inventory,
-          instock : instock,
-          images: uploadedImageUrls, 
+          imageUrls.push(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/cover-image/${fileName}`);
         }
+      }
+
+      const { data, error } = await supabase.from("books").insert([
+        {
+          name,
+          details,
+          price,
+          inventory,
+          instock,
+          coverimage: imageUrls, // Store multiple images as an array
+        },
       ]);
-  
-    if (error) {
-      console.error("Error adding book:", error);
-    } else {
+
+      if (error) throw error;
+
       console.log("Book added successfully:", data);
+      getBook(); // ✅ Refresh books after adding
+      return data;
+    } catch (error) {
+      console.error("Error adding book:", error.message);
+      setError(error.message);
+    }
+  };
+
+  // ✅ Improved fetchbook function with better error handling
+  const fetchbook = async (id) => {
+    setBook(null); // Reset previous state
+    setError(null);
+
+    const { data, error } = await supabase.from("books").select("*").eq("id", id).single();
+
+    if (error) {
+      console.error("Error fetching book:", error);
+      setError(error.message);
+    } else {
+      setBook(data);
+    }
+  };
+
+  const editBookdata = async (id, updatedBook) => {
+    try {
+      const { data, error } = await supabase
+        .from('books')
+        .update(updatedBook)
+        .eq('id', id)
+        .select();
+
+      if (error) throw error;
+      setBook(data[0]); // Update local state
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating book:', error);
+      return { success: false, error: error.message };
     }
   };
 
   return (
-    <ProductContext.Provider value={{ getBook, book,addBook, error, loading }}>
+    <ProductContext.Provider value={{ getBook, books, addBook, editBookdata, fetchbook, book, error, loading }}>
       {children}
     </ProductContext.Provider>
   );
 };
 
-// Custom Hook
+// ✅ Custom Hook for easy access
 export const useProduct = () => useContext(ProductContext);
 
 export default ProductProvider;
