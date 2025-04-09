@@ -90,20 +90,71 @@ const ProductProvider = ({ children }) => {
     }
   };
 
-  const editBookdata = async (id, updatedBook) => {
+  const updatedBook = async (id, updatedData, newImages) => {
     try {
+      let updatedImages = Array.isArray(updatedData.coverimage) ? [...updatedData.coverimage] : [];
+  
+      if (newImages.length > 0) {
+        const uploadedImages = await Promise.all(
+          newImages.map(async (image) => {
+            const fileExt = image.name.split(".").pop();
+            const fileBaseName = image.name.replace(`.${fileExt}`, "").replace(/\s+/g, "-");
+            const fileName = `${fileBaseName}-${Date.now()}.${fileExt}`;
+  
+            const { data, error } = await supabase.storage
+              .from("cover-image")
+              .upload(fileName, image);
+  
+            if (error) throw error;
+            return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/cover-image/${fileName}`;
+          })
+        );
+        updatedImages = [...updatedImages, ...uploadedImages]; // ✅ Append new images
+      }
+  
       const { data, error } = await supabase
-        .from('books')
-        .update(updatedBook)
-        .eq('id', id)
-        .select();
-
+        .from("books")
+        .update({ ...updatedData, coverimage: updatedImages }) // ✅ Corrected update
+        .eq("id", id);
+  
       if (error) throw error;
-      setBook(data[0]); // Update local state
-      return { success: true };
+  
+      fetchbook(id); // ✅ Refresh book data
     } catch (error) {
-      console.error('Error updating book:', error);
-      return { success: false, error: error.message };
+      console.error("Error updating book:", error);
+    }
+  };
+
+  
+  const removeImage = async (id, imageUrl) => {
+    try {
+      // Fetch the existing product data
+      const { data, error } = await supabase
+        .from("books")
+        .select("coverimage")
+        .eq("id", id)
+        .single(); // Get a single product
+  
+      if (error) throw error;
+      if (!data || !Array.isArray(data.coverimage)) {
+        console.error("No images found or invalid format.");
+        return;
+      }
+  
+      // Filter out the removed image
+      const updatedImages = data.coverimage.filter((img) => img !== imageUrl);
+  
+      // Update the database
+      const { error: updateError } = await supabase
+        .from("books")
+        .update({ coverimage: updatedImages })
+        .eq("id", id);
+  
+      if (updateError) throw updateError;
+  
+      console.log("Image removed successfully!");
+    } catch (err) {
+      console.error("Error removing image:", err);
     }
   };
    const deletePost = async (id) => {
@@ -120,7 +171,7 @@ const ProductProvider = ({ children }) => {
     return true;
   };
   return (
-    <ProductContext.Provider value={{ getBook, books, addBook,deletePost, editBookdata, fetchbook, book, error, loading }}>
+    <ProductContext.Provider value={{ getBook, books, addBook, editBookdata, fetchbook, book, error, loading }}>
       {children}
     </ProductContext.Provider>
   );
