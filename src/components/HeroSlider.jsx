@@ -37,15 +37,15 @@ const HeroSlider = () => {
         onAutoplayTimeLeft={onAutoplayTimeLeft}
         className="mySwiper"
       >
-        <SwiperSlide><div className='h- bg-blue-50'>Auto</div></SwiperSlide>
-        <SwiperSlide>Slide 2</SwiperSlide>
-        <SwiperSlide>Slide 3</SwiperSlide>
-        <SwiperSlide>Slide 4</SwiperSlide>
-        <SwiperSlide>Slide 5</SwiperSlide>
-        <SwiperSlide>Slide 6</SwiperSlide>
-        <SwiperSlide>Slide 7</SwiperSlide>
-        <SwiperSlide>Slide 8</SwiperSlide>
-        <SwiperSlide>Slide 9</SwiperSlide>
+        <SwiperSlide><div className='h-120 bg-blue-50'>Auto</div></SwiperSlide>
+        <SwiperSlide><div className='h-120 bg-blue-50'>Auto</div></SwiperSlide>
+        <SwiperSlide><div className='h-120 bg-blue-50'>Slide 3 Auto</div></SwiperSlide>
+        <SwiperSlide><div className='h-120 bg-blue-50'>Slide 4 Auto</div></SwiperSlide>
+        <SwiperSlide><div className='h-120 bg-blue-50'>Slide 5 Auto</div></SwiperSlide>
+        <SwiperSlide><div className='h-120 bg-blue-50'>Slide 6 Auto</div></SwiperSlide>
+        <SwiperSlide><div className='h-120 bg-blue-50'>Slide 7 Auto</div></SwiperSlide>
+        <SwiperSlide><div className='h-120 bg-blue-50'>Slide 8 Auto</div></SwiperSlide>
+        <SwiperSlide><div className='h-120 bg-blue-50'>Slide 9 Auto</div></SwiperSlide>
         <div className="autoplay-progress" slot="container-end">
           <svg viewBox="0 0 48 48" ref={progressCircle}>
             <circle cx="24" cy="24" r="20"></circle>

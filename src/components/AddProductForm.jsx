@@ -65,8 +65,8 @@ const AddProductForm = () => {
 
   return (
     <div>
-          <div className="flex justify-center items-center gap-2">
-      <form onSubmit={handleSubmit} className="space-y-4 mx-auto w-full max-w-md">
+          <div className="flex justify-center items-center gap-2 w-full">
+      <form onSubmit={handleSubmit} className="space-y-4 mx-auto">
         <div>
           <Label htmlFor="name">Book Name</Label>
           <Input id="name" name="name" value={book.name} onChange={handleChange} required />

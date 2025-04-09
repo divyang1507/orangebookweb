@@ -7,7 +7,7 @@ const ProductContext = createContext();
 
 const ProductProvider = ({ children }) => {
   const [books, setBooks] = useState([]);
-  const [book, setBook] = useState(null); // ✅ Changed from array to null
+  const [book, setBook] = useState({}); // ✅ Changed from array to null
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -106,9 +106,21 @@ const ProductProvider = ({ children }) => {
       return { success: false, error: error.message };
     }
   };
-
+   const deletePost = async (id) => {
+    const { error } = await supabase
+      .from('books')
+      .delete()
+      .eq('id', id);
+  
+    if (error) {
+      console.error('Delete error:', error);
+      return false;
+    }
+  
+    return true;
+  };
   return (
-    <ProductContext.Provider value={{ getBook, books, addBook, editBookdata, fetchbook, book, error, loading }}>
+    <ProductContext.Provider value={{ getBook, books, addBook,deletePost, editBookdata, fetchbook, book, error, loading }}>
       {children}
     </ProductContext.Provider>
   );

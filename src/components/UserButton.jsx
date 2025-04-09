@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { signOut } from "next-auth/react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,13 +9,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-// import { useUser } from "@/app/Context/UserContext";
 import { FiUser } from "react-icons/fi";
+import { useRouter } from "next/navigation";
 
-const UserButton = () => {
-//   const { logout } = useUser();
-const [user, setUser] = useState(true);
-const logout = ()=>{ setUser(false)}
+const UserButton = ({name}) => {
+  const router = useRouter()
+
   return (
     <div>
       <DropdownMenu>
@@ -24,9 +24,9 @@ const logout = ()=>{ setUser(false)}
         <DropdownMenuContent className="">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Profile</DropdownMenuItem>
+          <DropdownMenuItem onClick={()=>router.push('/user')}>{`profile : ${name}`}</DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => logout()}
+          onClick={() => signOut()}
             className="focus:bg-red-300 hover:bg-red-700 transition-colors">
             logout
           </DropdownMenuItem>
