@@ -8,7 +8,7 @@ import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 const Page = () => {
-  const { fetchbook, editBookdata, book } = useProduct();
+  const { fetchbook, editBookdata, book, prepareImageUrls } = useProduct();
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
 
@@ -16,7 +16,7 @@ const Page = () => {
     name: '',
     details: '',
     price: '',
-    coverimage: [], // New image files
+    image: [], // New image files
     existingImages: [], // Old image URLs
     inventory: '',
     instock: false,
@@ -38,14 +38,14 @@ const Page = () => {
         name: book.name || '',
         details: book.details || '',
         price: book.price || '',
-        coverimage: [], // Clear new uploads
-        existingImages: book.coverimage || [],
+        images: [], // Clear new uploads
+        existingImages: book.images || [],
         inventory: book.inventory || '',
         instock: book.instock || false,
       });
 
       // Show existing images as previews
-      setPreviewImages(book.coverimage || []);
+      setPreviewImages(book.images || []);
     }
   }, [book]);
 
@@ -64,7 +64,7 @@ const Page = () => {
 
     setFormData((prev) => ({
       ...prev,
-      coverimage: [...prev.coverimage, ...files],
+      images: [...prev.images, ...files],
     }));
 
     setPreviewImages((prev) => [...prev, ...newPreviews]);
@@ -86,9 +86,9 @@ const Page = () => {
         return { ...prev, existingImages: updatedExisting };
       } else {
         const newIndex = index - prev.existingImages.length;
-        const updatedNew = [...prev.coverimage];
+        const updatedNew = [...prev.images];
         updatedNew.splice(newIndex, 1);
-        return { ...prev, coverimage: updatedNew };
+        return { ...prev, images: updatedNew };
       }
     });
   };
@@ -96,13 +96,20 @@ const Page = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+  
     try {
+      const newImageUrls = await prepareImageUrls(formData.images);
+      const allImages = [...formData.existingImages, ...newImageUrls];
+  
       const payload = {
         ...formData,
-        coverimage: [...formData.existingImages, ...formData.coverimage],
+        images: allImages,
       };
-
+  
+      delete payload.existingImages; // ✨ Remove unwanted frontend-only data
+      delete payload.images;         // ✨ We'll add it again cleanly below
+      payload.images = allImages;
+  
       await editBookdata(id, payload);
       alert('Book updated successfully!');
     } catch (error) {
@@ -142,7 +149,7 @@ const Page = () => {
         <div className="flex gap-2 flex-wrap mt-2">
           {formData.existingImages.map((img, index) => (
             <div key={index} className="relative">
-              <img src={img} alt={`Preview ${index}`} className="w-20 h-20 object-cover rounded" />
+              <img src={img} alt={`Preview ${index}`} className="w-20 h-20 object- rounded" />
               <button
                 type="button"
                 onClick={() => removeImage(index)}
@@ -157,7 +164,7 @@ const Page = () => {
         <div className="flex gap-2 flex-wrap mt-2">
           {previewImages.map((img, index) => (
             <div key={index} className="relative">
-              <img src={img} alt={`Preview ${index}`} className="w-20 h-20 object-cover rounded" />
+              <img src={img} alt={`Preview ${index}`} className="w-20 h-20 object- rounded" />
               <button
                 type="button"
                 onClick={() => removeImage(index)}

@@ -1,64 +1,58 @@
+// app/user/page.jsx
 "use client";
-import { Button } from '@/components/ui/button'
-import React from 'react'
-import { getServerSession } from "next-auth";
+
+import { Button } from '@/components/ui/button';
 import { useRouter } from "next/navigation";
-import { authOptions } from '@/lib/auth';
+import { useSession } from "next-auth/react";
+import Image from "next/image";
 
-const page =  async () => {
-  const router = useRouter(); // Initialize router for navigation
-    const session = await getServerSession(authOptions); // Get user session
+export default function UserPage() {
+  const router = useRouter();
+  const { data: session, status } = useSession();
 
-    if (!session) {
-      redirect("/login"); // Redirect to login if no session
-    }
+  if (status === "loading") return <div className="text-center mt-10">Loading...</div>;
+  if (!session) {
+    router.push("/login");
+    return null;
+  }
+
   return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-12">
+      <div className="bg-white shadow-lg rounded-2xl w-full max-w-md p-6 text-center">
+        <div className="relative">
+          <Image
+            src="https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740"
+            alt="Banner"
+            className="w-full h-32 rounded-xl object-cover"
+            width={400}
+            height={120}
+          />
+          <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 w-[90px] h-[90px] rounded-full border-4 border-white overflow-hidden bg-orange-500">
+            <Image
+              src="https://horizon-tailwind-react-git-tailwind-components-horizon-ui.vercel.app/static/media/avatar11.1060b63041fdffa5f8ef.png"
+              alt="Avatar"
+              className="object-cover w-full h-full"
+              width={90}
+              height={90}
+            />
+          </div>
+        </div>
 
+        <div className="mt-14">
+          <h2 className="text-2xl font-bold text-gray-800">{session.user.name}</h2>
+          <p className="text-sm text-gray-500">{session.user.email}</p>
+          <p className="text-sm text-gray-500">{session.user.mobile}</p>
+        </div>
 
-    <div>
-    <h1>Welcome, {session.user.name}!</h1>
-    <p>Email: {session.user.email}</p>
-    <p>Mobile: {session.user.mobile}</p>
-    <Button onClick={() => router.push("/user/profile")} className='bg-blue-500 text-white'>Edit Profile</Button>
-  </div>
-    // <div>
-    //      <div className="flex flex-col justify-center items-center mt-24">
-    //         <div className="relative flex flex-col items-center rounded-[10px] border-[1px] border-gray-200 w-[400px] mx-auto p-4 bg-white bg-clip-border shadow-md shadow-[#F3F3F3] dark:border-[#ffffff33] dark:!bg-navy-800 dark:text-white dark:shadow-none">
-    //             <div className="relative flex h-32 w-full justify-center rounded-xl bg-cover" >
-    //                 <img src='https://horizon-tailwind-react-git-tailwind-components-horizon-ui.vercel.app/static/media/banner.ef572d78f29b0fee0a09.png' className="absolute flex h-32 w-full justify-center rounded-xl bg-cover"/> 
-    //                 <div className="absolute -bottom-12 flex h-[87px] w-[87px] items-center justify-center rounded-full border-[4px] border-white bg-pink-400 dark:!border-navy-700">
-    //                     <img className="h-full w-full rounded-full" src='https://horizon-tailwind-react-git-tailwind-components-horizon-ui.vercel.app/static/media/avatar11.1060b63041fdffa5f8ef.png' alt="" />
-    //                 </div>
-    //             </div> 
-    //             <div className="mt-16 flex flex-col items-center">
-    //                 <h4 className="text-xl font-bold text-navy-700 dark:text-white">
-    //                 Adela Parkson
-    //                 </h4>
-    //                 <p className="text-base font-normal text-gray-600">Product Manager</p>
-    //             </div> 
-    //             <div className="mt-6 mb-3 flex gap-14 md:!gap-14">
-    //                 <div className="flex flex-col items-center justify-center">
-    //                 <p className="text-2xl font-bold text-navy-700 dark:text-white">17</p>
-    //                 <p className="text-sm font-normal text-gray-600">Posts</p>
-    //                 </div>
-    //                 <div className="flex flex-col items-center justify-center">
-    //                 <p className="text-2xl font-bold text-navy-700 dark:text-white">
-    //                     9.7K
-    //                 </p>
-    //                 <p className="text-sm font-normal text-gray-600">Followers</p>
-    //                 </div>
-    //                 <div className="flex flex-col items-center justify-center">
-    //                 <p className="text-2xl font-bold text-navy-700 dark:text-white">
-    //                     434
-    //                 </p>
-    //                 <p className="text-sm font-normal text-gray-600">Following</p>
-    //                 </div>
-    //             </div>
-    //                 <Button className={"mt-4"}>Edit Profile</Button>
-    //         </div>  
-    //     </div>
-    // </div>
-  )
+        <div className="mt-6">
+          <Button
+            onClick={() => router.push("/user/profile")}
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg transition"
+          >
+            Edit Profile
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
 }
-
-export default page

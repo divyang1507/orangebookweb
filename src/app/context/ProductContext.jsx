@@ -44,12 +44,12 @@ const ProductProvider = ({ children }) => {
           const fileName = `${fileBaseName}-${Date.now()}.${fileExt}`;
 
           const { data, error } = await supabase.storage
-            .from("cover-image") // Bucket name
+            .from("bookimages") // Bucket name
             .upload(fileName, imageFile);
 
           if (error) throw error;
 
-          imageUrls.push(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/cover-image/${fileName}`);
+          imageUrls.push(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/bookimages/${fileName}`);
         }
       }
 
@@ -60,7 +60,7 @@ const ProductProvider = ({ children }) => {
           price,
           inventory,
           instock,
-          coverimage: imageUrls, // Store multiple images as an array
+          images: imageUrls, // Store multiple images as an array
         },
       ]);
 
@@ -119,8 +119,31 @@ const ProductProvider = ({ children }) => {
   
     return true;
   };
+
+  const prepareImageUrls = async (imageFiles) => {
+    const imageUrls = [];
+  
+    for (const imageFile of imageFiles) {
+      const fileExt = imageFile.name.split(".").pop();
+      const fileBaseName = imageFile.name.replace(`.${fileExt}`, "").replace(/\s+/g, "-");
+      const fileName = `${fileBaseName}-${Date.now()}.${fileExt}`;
+  
+      const { data, error } = await supabase.storage
+        .from("bookimages")
+        .upload(fileName, imageFile);
+  
+      if (error) throw error;
+  
+      imageUrls.push(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/bookimages/${fileName}`);
+    }
+  
+    return imageUrls;
+  };
+  
+
+
   return (
-    <ProductContext.Provider value={{ getBook, books, addBook,deletePost, editBookdata, fetchbook, book, error, loading }}>
+    <ProductContext.Provider value={{ getBook, books, addBook,deletePost, editBookdata, fetchbook, prepareImageUrls, book, error, loading }}>
       {children}
     </ProductContext.Provider>
   );

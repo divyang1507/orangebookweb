@@ -41,7 +41,7 @@ const AdminProducts = () => {
               <TableCell>{item.inventory}</TableCell>
               <TableCell>{item.instock ? "in Stock" : "Stopped"}</TableCell>
               <TableCell className="text-right">
-                <Link href={`/editpage/${item.id}`}>Edit</Link>
+                <Link href={`/admin/editpage/${item.id}`}>Edit</Link>
               </TableCell>
               <TableCell onClick={async()=> await deletePost(item.id)} className="text-right">
                 Delete

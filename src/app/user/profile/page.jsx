@@ -91,63 +91,85 @@ export default function ProfilePage() {
   if (status === "loading") return <div>Loading...</div>;
 
   return (
-    <div className="p-6 max-w-md mx-auto">
-      <h2 className="text-xl font-bold mb-4">Edit Profile</h2>
-
-      <input
-        name="name"
-        value={form.name}
-        onChange={handleChange}
-        className="w-full p-2 mb-4 border rounded"
-        placeholder="Name"
-      />
-      <input
-        name="mobile"
-        value={form.mobile}
-        onChange={handleChange}
-        className="w-full p-2 mb-4 border rounded"
-        placeholder="Mobile"
-      />
-      <input
-        name="address"
-        value={form.address}
-        onChange={handleChange}
-        className="w-full p-2 mb-4 border rounded"
-        placeholder="Address"
-      />
-
-      <button
-        onClick={handleUpdate}
-        className="bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600 mb-6"
-      >
-        Save Profile Changes
-      </button>
-
-      <h2 className="text-xl font-bold mb-4">Change Password</h2>
-
-      <input
-        type="password"
-        name="password"
-        value={passwords.password}
-        onChange={handlePasswordChange}
-        className="w-full p-2 mb-4 border rounded"
-        placeholder="New Password"
-      />
-      <input
-        type="password"
-        name="confirmPassword"
-        value={passwords.confirmPassword}
-        onChange={handlePasswordChange}
-        className="w-full p-2 mb-4 border rounded"
-        placeholder="Confirm New Password"
-      />
-
-      <button
-        onClick={handleChangePassword}
-        className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
-      >
-        Change Password
-      </button>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8">
+        <h2 className="text-2xl font-bold text-orange-600 mb-6 text-center">Edit Profile</h2>
+  
+        <div className="grid grid-cols-1 gap-5 mb-8">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Name</label>
+            <input
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
+              placeholder="Full Name"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Mobile</label>
+            <input
+              name="mobile"
+              value={form.mobile}
+              onChange={handleChange}
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
+              placeholder="Mobile Number"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Address</label>
+            <input
+              name="address"
+              value={form.address}
+              onChange={handleChange}
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
+              placeholder="Address"
+            />
+          </div>
+          <button
+            onClick={handleUpdate}
+            className="bg-orange-600 text-white w-full py-2 rounded-lg hover:bg-orange-700 font-semibold transition"
+          >
+            Save Profile Changes
+          </button>
+        </div>
+  
+        <hr className="my-6 border-t border-gray-200" />
+  
+        <h2 className="text-2xl font-bold text-orange-600 mb-6 text-center">Change Password</h2>
+  
+        <div className="grid grid-cols-1 gap-5">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">New Password</label>
+            <input
+              type="password"
+              name="password"
+              value={passwords.password}
+              onChange={handlePasswordChange}
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
+              placeholder="New Password"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
+            <input
+              type="password"
+              name="confirmPassword"
+              value={passwords.confirmPassword}
+              onChange={handlePasswordChange}
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
+              placeholder="Confirm New Password"
+            />
+          </div>
+          <button
+            onClick={handleChangePassword}
+            className="bg-green-600 text-white w-full py-2 rounded-lg hover:bg-green-700 font-semibold transition"
+          >
+            Change Password
+          </button>
+        </div>
+      </div>
     </div>
   );
+  
 }
