@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import bcrypt from "bcryptjs";
 import { supabase } from "@/lib/superbaseclient";
 import { useGoBack } from "@/utils/Navigation";
+import { HashLoader } from "react-spinners";
 
 export default function ProfilePage() {
   const { data: session, update, status } = useSession();
@@ -94,7 +95,9 @@ export default function ProfilePage() {
   const goBack = useGoBack();
   
 
-  if (status === "loading") return <div>Loading...</div>;
+  if (status === "loading") return <div className="flex justify-center items-center h-96">
+          <HashLoader color="#f97316" />
+        </div>
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-10">

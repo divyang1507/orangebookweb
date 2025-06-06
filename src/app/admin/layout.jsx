@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import SideNav from "@/components/SideNav";
+import { HashLoader } from "react-spinners";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,7 +36,9 @@ export default function RootLayout({ children }) {
   }, [session, status]);
 
   if (status === 'loading' || (status === 'authenticated' && !isAllowed)) {
-    return <div className="p-4">Loading...</div>;
+    return  <div className="flex justify-center items-center h-96">
+          <HashLoader color="#f97316" />
+        </div>
   }
 
   return (

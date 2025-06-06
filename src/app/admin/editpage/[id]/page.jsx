@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import { HashLoader } from 'react-spinners';
 
 const Page = () => {
   const { fetchbook, editBookdata, book, prepareImageUrls } = useProduct();
@@ -121,7 +122,9 @@ const Page = () => {
   };
 
   if (!book || Object.keys(book).length === 0) {
-    return <p>Loading book data...</p>;
+    return  <div className="flex justify-center items-center h-96">
+          <HashLoader color="#f97316" />
+        </div>
   }
 
   return (

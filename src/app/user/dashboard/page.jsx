@@ -5,12 +5,15 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { HashLoader } from 'react-spinners';
 
 export default function UserPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
 
-  if (status === "loading") return <div className="text-center mt-10">Loading...</div>;
+  if (status === "loading") return  <div className="flex justify-center items-center h-96">
+          <HashLoader color="#f97316" />
+        </div>
   if (!session) {
     router.push("/login");
     return null;
