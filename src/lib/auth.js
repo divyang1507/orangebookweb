@@ -1,72 +1,79 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { createClient } from "@supabase/supabase-js";
 import bcrypt from "bcryptjs";
 import { supabase } from "@/lib/superbaseclient";
+
 export const authOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email", required: true },
+        identifier: { label: "Email or Mobile", type: "text", required: true },
         password: { label: "Password", type: "password", required: true },
       },
       async authorize(credentials) {
-        const { email, password } = credentials;
+        const { identifier, password } = credentials;
 
-        // Fetch user from Supabase
-        const { data: users, error } = await supabase
+        // Check if identifier is email or mobile
+        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+
+        const { data: user, error } = await supabase
           .from("users")
           .select("*")
-          .eq("email", email)
+          .eq(isEmail ? "email" : "mobile", identifier)
           .single();
 
-        if (error || !users) {
-          throw new Error("User not found");
-        }
+        if (error || !user) throw new Error("User not found");
 
-        const isValidPassword = await bcrypt.compare(password, users.password);
-        if (!isValidPassword) {
-          throw new Error("Invalid credentials");
-        }
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) throw new Error("Invalid credentials");
 
         return {
-          id: users.id,
-          email: users.email,
-          name: users.name,
-          username: users.username,
-          mobile_number: users.mobile_number,
-          address: users.address,
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          mobile: user.mobile,
+          role: user.role,
         };
       },
     }),
   ],
+
+  session: {
+    strategy: "jwt",
+  },
+
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
-        token.username = user.username;
-        token.mobile_number = user.mobile_number;
-        token.address = user.address;
+        token.mobile = user.mobile;
+        token.role = user.role;
       }
       return token;
     },
     async session({ session, token }) {
-      session.user.id = token.id;
-      session.user.email = token.email;
-      session.user.name = token.name;
-      session.user.username = token.username;
-      session.user.mobile_number = token.mobile_number;
-      session.user.address = token.address;
+      if (token) {
+        session.user = {
+          id: token.id,
+          email: token.email,
+          name: token.name,
+          mobile: token.mobile,
+          role: token.role,
+        };
+      }
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET,
-  session: {
-    strategy: "jwt",
+
+  pages: {
+    signIn: "/login",
   },
+
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
-export default NextAuth(authOptions);
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };

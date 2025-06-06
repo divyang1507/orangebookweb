@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import ProductCard from "@/components/ProductCard";
 import BookSection from "@/components/BookSection";
 import AboutSection from "@/components/AboutSection";
+import ContactSection from "@/components/ContactSection";
 
 export default function Home() {
 
@@ -21,6 +22,9 @@ export default function Home() {
     </div>
   <div className="mt-16">
    <AboutSection/>
+    </div>
+  <div className="mt-16">
+   <ContactSection/>
     </div>
   </div>
 

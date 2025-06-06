@@ -45,7 +45,23 @@ const Navbar = () => {
         {/* Auth Buttons */}
         <div className="hidden lg:flex gap-4">
           {session ? (
-            <UserButton name={session.user.name} />
+            <>
+              <UserButton name={session.user.name} />
+
+              {session.user.role ==='superadmin' || "admin" ? (
+                <Button
+                  onClick={() => {
+                    router.push("/admin");
+                    setMenuOpen(false);
+                  }}
+                  className="bg-orange-500 hover:bg-orange-700 text-white"
+                >
+                  {session.user.role} 
+                </Button>
+              ) : (
+                <></>
+              )}
+            </>
           ) : (
             <>
               <Button
@@ -89,33 +105,6 @@ const Navbar = () => {
               </li>
             ))}
           </ul>
-          <div className="flex flex-col gap-3 mt-4">
-            {session ? (
-              <UserButton name={session.user.name} />
-            ) : (
-              <>
-                <Button
-                  onClick={() => {
-                    router.push("/login");
-                    setMenuOpen(false);
-                  }}
-                  className="bg-orange-500 hover:bg-orange-700 text-white"
-                >
-                  Login
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    router.push("/signup");
-                    setMenuOpen(false);
-                  }}
-                  className="border-2 border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
-                >
-                  Signup
-                </Button>
-              </>
-            )}
-          </div>
         </div>
       )}
     </nav>

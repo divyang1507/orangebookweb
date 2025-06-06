@@ -26,7 +26,7 @@ const UserButton = ({name}) => {
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={()=>router.push('/user')}>{`profile : ${name}`}</DropdownMenuItem>
           <DropdownMenuItem
-          onClick={() => signOut()}
+          onClick={() => signOut({ callbackUrl: "/" })}
             className="focus:bg-red-300 hover:bg-red-700 transition-colors">
             logout
           </DropdownMenuItem>

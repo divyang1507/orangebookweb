@@ -3,6 +3,7 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import bcrypt from "bcryptjs";
 import { supabase } from "@/lib/superbaseclient";
+import { useGoBack } from "@/utils/Navigation";
 
 export default function ProfilePage() {
   const { data: session, update, status } = useSession();
@@ -31,6 +32,7 @@ export default function ProfilePage() {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+
 
   const handlePasswordChange = (e) => {
     setPasswords({ ...passwords, [e.target.name]: e.target.value });
@@ -88,13 +90,23 @@ export default function ProfilePage() {
     }
   };
 
+
+  const goBack = useGoBack();
+  
+
   if (status === "loading") return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-10">
+     
       <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8">
+          <div>
+        <button onClick={goBack} className="mb-4 text-sm text-blue-600 hover:underline">
+          Back
+        </button>
+      </div>
         <h2 className="text-2xl font-bold text-orange-600 mb-6 text-center">Edit Profile</h2>
-  
+ 
         <div className="grid grid-cols-1 gap-5 mb-8">
           <div>
             <label className="block text-sm font-medium text-gray-700">Name</label>

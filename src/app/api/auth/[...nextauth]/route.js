@@ -8,49 +8,57 @@ const handler = NextAuth({
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" }
+        identifier: { label: "Email or Mobile Number", type: "text" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const { data: users } = await supabase
+        const { identifier, password } = credentials;
+        const isEmail = identifier.includes("@");
+
+        const { data: users, error } = await supabase
           .from("users")
           .select("*")
-          .eq("email", credentials.email);
+          .eq(isEmail ? "email" : "mobile", identifier);
+
+        if (error) throw new Error("Database query failed");
 
         const user = users?.[0];
 
-        if (user && await bcrypt.compare(credentials.password, user.password)) {
+        if (user && await bcrypt.compare(password, user.password)) {
           return {
             id: user.id,
             name: user.name,
             email: user.email,
             mobile: user.mobile,
-            address: user.address
+            address: user.address,
+            role: user.role, // Default role if not set
           };
         }
+
         return null;
       }
     })
   ],
   session: {
-    strategy: "jwt"
+    strategy: "jwt",
   },
   callbacks: {
     async jwt({ token, user, trigger, session }) {
       if (user) {
-        // On initial sign in
+        token.id = user.id;
         token.name = user.name;
+        token.email = user.email;
         token.mobile = user.mobile;
         token.address = user.address;
+        token.role = user.role; // Default role if not set
       }
-  
+
       if (trigger === "update" && session) {
-        // When calling `update()` in the frontend
         token.name = session.name;
         token.mobile = session.mobile;
         token.address = session.address;
       }
-  
+
       return token;
     },
     async session({ session, token }) {
@@ -60,9 +68,11 @@ const handler = NextAuth({
         email: token.email,
         mobile: token.mobile,
         address: token.address,
+        role: token.role, // Default role if not set
       };
       return session;
-    }},
+    }
+  },
   pages: {
     signIn: "/login"
   }

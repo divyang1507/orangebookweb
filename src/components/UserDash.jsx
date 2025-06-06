@@ -3,13 +3,19 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 import { Button } from './ui/button';
 import Image from 'next/image';
+import { useGoBack } from '@/utils/Navigation';
 
 const UserDash = ({ session }) => {
   const router = useRouter();
-
+  const goBack = useGoBack();
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
       <div className="bg-white shadow-xl rounded-2xl w-full max-w-md p-6 text-center">
+                  <div>
+        <button onClick={goBack} className="mb-4 text-sm text-blue-600 hover:underline">
+          Back
+        </button>
+      </div>
         <div className="flex justify-center">
           <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-orange-500">
             <Image
