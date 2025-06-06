@@ -56,7 +56,7 @@ const Navbar = () => {
                   }}
                   className="bg-orange-500 hover:bg-orange-700 text-white"
                 >
-                  {session.user.role} 
+                  Admin Dashboard 
                 </Button>
               ) : (
                 <></>
